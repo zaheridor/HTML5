@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Listas de Tareas</title>
+        <link rel="stylesheet" type="text/css" href="styles/tasks.css" media="screen"/>
+        <script src="scripts/jquery-3.2.1.js"></script>
+        <script src="scripts/jquery.tmpl.js"></script>
+    </head>
+    <body>
+        <header>
+            <span>Lista de Tarea</span>
+        </header>
+        <main>
+            <section id="taskCreation" class="not">
+                <form>
+                    <div>
+                        <label>Tarea</label>
+                        <input type="text" required="required" name="task" class="large" placeholder="Desayunadero de la 42"/>
+                    </div>
+                    <div>
+                        <label>Solicitado por</label>
+                        <input type="date" required="required" name="requiredBy" />
+                    </div>
+                    <div>
+                        <label>Categoría</label>
+                        <select name="category">
+                            <option value="Personal">Personal</option>
+                            <option value="Work">Laboral</option>
+                        </select>
+                    </div>
+                    <nav>
+                        <a href="#" id="saveTask">Guardar Tarea</a>
+                        <a href="#">Limpiar</a>
+                    </nav>
+                </form>
+            </section>
+            <section>
+                <table id="tblTask">
+                    <colgroup>
+                        <col width="40%">
+                        <col width="15%">
+                        <col width="15%">
+                        <col width="30%">
+                    </colgroup>
+                    <thead>
+                        <tr>Nombre</tr>
+                        <tr>Límite</tr>
+                        <tr>Categoría</tr>
+                        <tr>Acciones</tr>
+                    </thead>
+                    <tbody>
+                        <!--
+                        <tr data-priority="high">
+                            <td data-name-field="true">Devolver libros a la biblioteca</td>
+                            <td><time datetime="2013-10-14">2013-10-14</time></td>
+                            <td>Personal</td>
+                            <td>
+                                <nav>
+                                    <a href="#" class="editRow">Editar</a>
+                                    <a href="#" class="completeRow">Completar</a>
+                                    <a href="#" class="deleteRow">Borrar</a>
+                                </nav>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Presentar demo</td>
+                            <td><time datetime="2013-10-14">2013-10-14</time></td>
+                            <td>Laboral</td>
+                            <td>
+                                <nav>
+                                    <a href="#" class="editRow">Editar</a>
+                                    <a href="#" class="completeRow">Completar</a>
+                                    <a href="#" class="deleteRow">Borrar</a>
+                                </nav>
+                            </td>
+                        </tr>
+                        <tr data-priority="medium">
+                            <td>Encuentro amigos cena</td>
+                            <td><time datetime="2013-10-14">2013-10-14</time></td>
+                            <td>Personal</td>
+                            <td>
+                                <nav>
+                                    <a href="#" class="editRow">Editar</a>
+                                    <a href="#" class="completeRow">Completar</a>
+                                    <a href="#" class="deleteRow">Borrar</a>
+                                </nav>
+                            </td>
+                        </tr>
+                        -->
+                    </tbody>
+                </table>
+                <nav>
+                    <a href="#" id="btnAddTask">Añadir Tarea</a>
+                </nav>
+            </section>
+        </main>
+        <footer>Tiene 3 tareas</footer>
+    </body>
+    <script>
+        $(document).ready(function(){
+            $('[required="required"]').prev('label').append('<span>*</span>').children('span').addClass('required');
+            $('tbody tr:even').addClass('even');
+
+            $('#saveTask').click(function(evt){
+                evt.preventDefault();
+                var task = $('form').toObject();
+                $('#taskRow').tmpl(task).appendTo($('#tblTask tbody'));
+            });
+
+            $('#btnAddTask').click(function(evt){
+                evt.preventDefault();
+                $('#taskCreation').removeClass('not');
+            });
+
+            $('tbody tr').click(function(evt){
+                $(evt.target).closest('td').siblings().addBack().toggleClass('rowHighlight');
+            });
+
+            $('#tblTask tbody').on('click','.deleteRow',function(evt){
+                evt.preventDefault();
+                $(evt.target).parents('tr').remove();
+            });
+
+            (function($){
+                $.fn.extend({
+                    toObject:function(){
+                        var result = {}
+                        $.each(
+                            this.serializeArray(),
+                            function(i,v){
+                                result[v.name] = v.value;
+                            }
+                        );
+                        return result;
+                    },
+                    fromObject:function(obj){
+                        $.each(
+                            this.find(':input'),
+                            function(i,v){
+                                var name = $(v).attr('name');
+                                if(obj[name]){
+                                    $(v).val(obj[name]);
+                                }
+                                else{
+                                    $(v).val('');
+                                }
+                            }
+                        );
+                    }
+                });
+            })(jQuery);
+         });
+    </script>
+    <script id="taskRow" type="text/x-jQuery-tmpl">
+        <tr>
+            <td>${task}</td>
+            <td><time datetime="${requiredBy}">${requiredBy}</time></td>
+            <td>${category}</td>
+            <td>
+                <nav>
+                    <a href="#">Editar</a>
+                    <a href="#">Completar</a>
+                    <a href="#" class="deleteRow">Borrar</a>
+                </nav>
+            </td>
+        </tr>       
+    </script>
+</html>
