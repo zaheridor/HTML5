@@ -6,12 +6,14 @@
         <link rel="stylesheet" type="text/css" href="styles/tasks.css" media="screen"/>
         <script src="scripts/jquery-3.2.1.js"></script>
         <script src="scripts/jquery.tmpl.js"></script>
+        <script src="scripts/jquery-serialization.js"></script>
+        <script src="scripts/tasks-controller.js"></script>
     </head>
     <body>
         <header>
             <span>Lista de Tarea</span>
         </header>
-        <main>
+        <main id="taskPage">
             <section id="taskCreation" class="not">
                 <form>
                     <div>
@@ -31,7 +33,7 @@
                     </div>
                     <nav>
                         <a href="#" id="saveTask">Guardar Tarea</a>
-                        <a href="#">Limpiar</a>
+                        <a href="#" id="clearTask">Limpiar</a>
                     </nav>
                 </form>
             </section>
@@ -49,46 +51,6 @@
                         <tr>Categoría</tr>
                         <tr>Acciones</tr>
                     </thead>
-                    <tbody>
-                        <!--
-                        <tr data-priority="high">
-                            <td data-name-field="true">Devolver libros a la biblioteca</td>
-                            <td><time datetime="2013-10-14">2013-10-14</time></td>
-                            <td>Personal</td>
-                            <td>
-                                <nav>
-                                    <a href="#" class="editRow">Editar</a>
-                                    <a href="#" class="completeRow">Completar</a>
-                                    <a href="#" class="deleteRow">Borrar</a>
-                                </nav>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Presentar demo</td>
-                            <td><time datetime="2013-10-14">2013-10-14</time></td>
-                            <td>Laboral</td>
-                            <td>
-                                <nav>
-                                    <a href="#" class="editRow">Editar</a>
-                                    <a href="#" class="completeRow">Completar</a>
-                                    <a href="#" class="deleteRow">Borrar</a>
-                                </nav>
-                            </td>
-                        </tr>
-                        <tr data-priority="medium">
-                            <td>Encuentro amigos cena</td>
-                            <td><time datetime="2013-10-14">2013-10-14</time></td>
-                            <td>Personal</td>
-                            <td>
-                                <nav>
-                                    <a href="#" class="editRow">Editar</a>
-                                    <a href="#" class="completeRow">Completar</a>
-                                    <a href="#" class="deleteRow">Borrar</a>
-                                </nav>
-                            </td>
-                        </tr>
-                        -->
-                    </tbody>
                 </table>
                 <nav>
                     <a href="#" id="btnAddTask">Añadir Tarea</a>
@@ -98,60 +60,11 @@
         <footer>Tiene 3 tareas</footer>
     </body>
     <script>
-        $(document).ready(function(){
-            $('[required="required"]').prev('label').append('<span>*</span>').children('span').addClass('required');
-            $('tbody tr:even').addClass('even');
-
-            $('#saveTask').click(function(evt){
-                evt.preventDefault();
-                var task = $('form').toObject();
-                $('#taskRow').tmpl(task).appendTo($('#tblTask tbody'));
-            });
-
-            $('#btnAddTask').click(function(evt){
-                evt.preventDefault();
-                //evt.callUnknownFunction();    //generar error para probar depurador
-                $('#taskCreation').removeClass('not');
-            });
-
-            $('tbody tr').click(function(evt){
-                $(evt.target).closest('td').siblings().addBack().toggleClass('rowHighlight');
-            });
-
-            $('#tblTask tbody').on('click','.deleteRow',function(evt){
-                evt.preventDefault();
-                $(evt.target).parents('tr').remove();
-            });
-
-            (function($){
-                $.fn.extend({
-                    toObject:function(){
-                        var result = {}
-                        $.each(
-                            this.serializeArray(),
-                            function(i,v){
-                                result[v.name] = v.value;
-                            }
-                        );
-                        return result;
-                    },
-                    fromObject:function(obj){
-                        $.each(
-                            this.find(':input'),
-                            function(i,v){
-                                var name = $(v).attr('name');
-                                if(obj[name]){
-                                    $(v).val(obj[name]);
-                                }
-                                else{
-                                    $(v).val('');
-                                }
-                            }
-                        );
-                    }
-                });
-            })(jQuery);
-         });
+        $(document).ready(
+            function(){
+                tasksController.init($('#taskPage'));
+            }
+        );
     </script>
     <script id="taskRow" type="text/x-jQuery-tmpl">
         <tr>
