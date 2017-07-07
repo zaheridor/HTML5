@@ -6,6 +6,7 @@
         <link rel="stylesheet" type="text/css" href="styles/tasks.css" media="screen"/>
         <script src="scripts/jquery-3.2.1.js"></script>
         <script src="scripts/jquery.tmpl.js"></script>
+        <script src="scripts/jquery.validate.js"></script>
         <script src="scripts/jquery-serialization.js"></script>
         <script src="scripts/tasks-controller.js"></script>
     </head>
@@ -18,7 +19,7 @@
                 <form>
                     <div>
                         <label>Tarea</label>
-                        <input type="text" required="required" name="task" class="large" placeholder="Desayunadero de la 42"/>
+                        <input type="text" required="required" maxlength="200" name="task" class="large" placeholder="Desayunadero de la 42"/>
                     </div>
                     <div>
                         <label>Solicitado por</label>
