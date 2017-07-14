@@ -53,6 +53,14 @@ tasksController = function(){
 
 				initialised = true;
 			}
+		},
+
+		loadTasks:function(){
+			storageEngine.findAll('task',function(tasks){
+				$.each(tasks,function(index,task){
+					$('#taskRow').tmpl(task).appendTo($(taskPage).find('#tblTasks tbody'));
+				});
+			},errorLogger);
 		}
 	}
 }();

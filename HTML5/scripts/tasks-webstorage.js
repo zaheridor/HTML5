@@ -1,6 +1,13 @@
 storageEngine = function(){
 	var initialized = false;
 	var initializedObjectStores = {};
+
+	function getStorageObject(type){
+		var item = localStorage.getItem(type);
+		var parsedItem = JSON.parse(item);
+		return parsedItem;
+	}
+
 	return{
 		init:function(successCallback,errorCallback){
 			if(window.localStorage){
@@ -37,15 +44,27 @@ storageEngine = function(){
 				obj.id = $.now();
 			}
 
-			var savedTypeString = localStorage.getItem(type);
-			var storageItem = JSON.parse(savedTypeString);
+			var storageItem = getStorageObject(type);
 			storageItem[obj.id] = obj;
 			localStorage.setItem(type,JSON.stringify(storageItem));
 			successCallback(obj);
 		},
 
 		findAll:function(type,successCallback,errorCallback){
+			if(!initialized){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+			}
+			else if(!initializedObjectStores[type]){
+				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
+			}
 
+			var result = [];
+			var storageItem = getStorageObject(type);
+			$.each(storageItem,function(i,v){
+				result.push(v);
+			});
+
+			successCallback(result);
 		},
 
 		delete:function(type,id,successCallback,errorCallback){
