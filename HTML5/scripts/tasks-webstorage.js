@@ -68,7 +68,22 @@ storageEngine = function(){
 		},
 
 		delete:function(type,id,successCallback,errorCallback){
+			if(!initialized){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+			}
+			else if(!initializedObjectStores[type]){
+				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
+			}
 
+			var storageItem = getStorageObject(type);
+			if(storageItem[id]){
+				delete storageItem[id];
+				localStorage.setItem(type,JSON.stringify(storageItem));
+				successCallback(id);
+			}
+			else{
+				errorCallback('object_not_found','Objeto no encontrado');
+			}
 		},
 
 		findByProperty:function(type,propertyName,propertyValue,successCallback,errorCallback){

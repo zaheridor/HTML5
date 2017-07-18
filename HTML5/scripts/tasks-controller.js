@@ -35,7 +35,15 @@ tasksController = function(){
 													   'deleteRow',
 														function(evt){
 															evt.preventDefault();
-															$(evt.target).parents('tr').remove();
+															$(taskPage).find('#tblTasks tbody').on('click',
+																								   'deleteRow',
+																								   function(evt){
+																								   		storageEngine.delete('task',
+																								   							 '$(evt.target).data().taskId',
+																							   							 	 function(){
+																								   								$(evt.target).parents('tr').remove();
+																							   								 })
+																								   },errorLogger);
 														}
 				);
 
