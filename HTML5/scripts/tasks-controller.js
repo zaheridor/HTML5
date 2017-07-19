@@ -25,21 +25,26 @@ tasksController = function(){
 					}
 				);
 
-				$(taskPage).find('tbody tr').click(
-					function(evt){
-						$(evt.target).closet('td').siblings().addBack().toggleClass('rowHighlight');
-					}
+				$(taskPage).find('tbody tr').on('click',
+												'editRow',
+												function(evt){
+													$(taskPage).find('#taskCreation').removeClass('not');
+													storageEngine.findById('task',$(evt.target).data().taskId,function(task){
+														$(taskPage).find('form').fromObject(task);
+													},errorLogger);
+												}
+					
 				);
 
-				$(taskPage).find('#tblTasks tbody').on('click',
-													   'deleteRow',
+				$(taskPage).find('#tblTasks tbody').on( 'click',
+													    'deleteRow',
 														function(evt){
 															evt.preventDefault();
 															$(taskPage).find('#tblTasks tbody').on('click',
 																								   'deleteRow',
 																								   function(evt){
 																								   		storageEngine.delete('task',
-																								   							 '$(evt.target).data().taskId',
+																								   							 $(evt.target).data().taskId,
 																							   							 	 function(){
 																								   								$(evt.target).parents('tr').remove();
 																							   								 })
@@ -52,8 +57,11 @@ tasksController = function(){
 						evt.preventDefault();
 						if($(taskPage).find('form').valid()){
 							var task = $('form').toObject();
-							storageEngine.save('task',task,function(savedTask){
-								$('#taskRow').tmpl(savedTask).appendTo($(taskPage).find('#tblTasks tbody'));
+							storageEngine.save('task',task,function(){
+								$(taskPage).find('#tblTasks tbody').empty();
+								tasksController.loadTasks();
+								$(':input').val('');
+								$(taskPage).find('#taskCreation').addClass('not');
 							},errorLogger);
 						}
 					}

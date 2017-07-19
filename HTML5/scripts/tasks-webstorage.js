@@ -87,11 +87,34 @@ storageEngine = function(){
 		},
 
 		findByProperty:function(type,propertyName,propertyValue,successCallback,errorCallback){
+			if(!initialized){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+			}
+			else if(!initializedObjectStores[type]){
+				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
+			}
 
+			var result = [];
+			var storageItem = getStorageObject(type);
+			$.each(storageItem,function(i,v){
+				if(v[propertyName] === propertyValue){
+					result.push(v);
+				}
+			});
+			successCallback(result);
 		},
 
 		findById:function(type,id,successCallback,errorCallback){
+			if(!initialized){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+			}
+			else if(!initializedObjectStores[type]){
+				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
+			}
 
+			var storageItem = getStorageObject(type);
+			var result = storageItem[id];
+			successCallback(result);	
 		}
 	}
 }();
