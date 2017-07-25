@@ -26,10 +26,10 @@ storageEngine = function(){
 			else if(!localStorage.getItem(type)){
 				localStorage.setItem(type,JSON.stringify({}));
 			}
-			else{
-				initializedObjectStores[type]=true;
-				successCallback(null);
-			}
+
+			initializedObjectStores[type]=true;
+			successCallback(null);
+			
 		},
 
 		save:function(type,obj,successCallback,errorCallback){
