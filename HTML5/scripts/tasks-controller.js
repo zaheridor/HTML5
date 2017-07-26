@@ -7,14 +7,18 @@ tasksController = function(){
 	var initialised = false;
 
 	return{
-		init:function(page){
-			storageEngine.init(function(){
-				storageEngine.initObjectStore('task',function(){
-
-				},errorLogger)
-			},errorLogger);
-			if(!initialised){
+		init:function(page,callback){
+			if(initialised){
+				callback()
+			}
+			else{
 				taskPage=page;
+				storageEngine.init(function(){
+					storageEngine.initObjectStore('task',function(){
+						callback();
+					},errorLogger)
+				},errorLogger);
+
 				$(taskPage).find('[required="required"]').prev('label').append('<span>*</span>').children('span').addClass('required');
 				$(taskPage).find('tbody tr:even').addClass('even');
 				

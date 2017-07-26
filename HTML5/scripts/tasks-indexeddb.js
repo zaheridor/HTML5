@@ -56,7 +56,32 @@ storageEngine = function(){
 		},
 
 		save:function(type,obj,successCallback,errorCallback){
+			if(!database){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
+			}
 
+			if(!obj.id){
+				delete obj.id;
+			}
+			else{
+				obj.id=parseInt(obj.id)
+			}
+
+			var tx=database.transaction([type],"readwrite");
+			tx.oncomplete=function(event){
+				successCallback(obj);
+			};
+
+			var objectStore=tx.objectStore(type);
+			var request=objectStore.put(obj);
+			
+			request.onsuccess=function(event){
+				obj.id=event.target.result
+			}
+
+			request.onerror=function(event){
+				errorCallback('object_not_stored','no es posible almacenar el objeto');
+			};
 		},
 
 		findAll:function(type,successCallback,errorCallback){
