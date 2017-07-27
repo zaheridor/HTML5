@@ -6,6 +6,7 @@ storageEngine = function(){
 		init:function(successCallback,errorCallback){
 			if(window.indexedDB){
 				var request = indexedDB.open(window.location.hostname+'DB',1)
+				
 				request.onsuccess=function(event){
 					database=request.result;
 					successCallback(null);
@@ -40,6 +41,7 @@ storageEngine = function(){
 				var version=database.version+1;
 				database.close();
 				var request=indexedDB.open(window.location.hostname+'DB',version);
+				
 				request.onsuccess=function(event){
 					successCallback(null);
 				}
@@ -68,8 +70,13 @@ storageEngine = function(){
 			}
 
 			var tx=database.transaction([type],"readwrite");
+			
 			tx.oncomplete=function(event){
 				successCallback(obj);
+			};
+
+			tx.onerror=function(event){
+				errorCallback('transaction_error','no es posible almacenar el objeto');
 			};
 
 			var objectStore=tx.objectStore(type);
@@ -85,18 +92,92 @@ storageEngine = function(){
 		},
 
 		findAll:function(type,successCallback,errorCallback){
+			if(!database){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
 
+			}
+
+			var result=[];
+			var tx=database.transaction(type);
+			var objectStore=tx.objectStore(type);
+			objectStore.openCursor().onsuccess=function(event){
+				var cursor=event.target.result;
+				if(cursor){
+					result.push(cursor.value);
+					cursor.continue;
+				}
+				else{
+					successCallback(result);
+				}
+			};
 		},
 
 		delete:function(type,id,successCallback,errorCallback){
+			var obj={};
+			obj.id=id;
+			var tx=database.transaction([type],"readwrite");
+			
+			tx.oncomplete=function(event){
+				successCallback(id);
+			};
 
+			tx.onerror=function(event){
+				console.log(event);
+				errorCallback('transaction_error','no es posible almacenar el objeto');
+			};
+
+			var objectStore=tx.objectStore(type);
+			var request=objectStore.delete(id);
+
+			request.onsuccess=function(event){
+
+			}
+
+			request.onerror=function(event){
+				errorCallback('object_not_stored','no es posible borrar el objeto');
+			};
 		},
 
 		fundByProperty:function(type,propertyName,propertyValue,successCallback,errorCallback){
+			if(!database){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
+
+			}
+
+			var result=[];
+			var tx=database.transaction(type);
+			var objectStore=tx.objectStore(type);
+			objectStore.openCursor().onsuccess=function(event){
+				var cursor=event.target.result;
+				if(cursor){
+					if(cursor.value[propertyName]==propertyValue){
+						result.push(cursor.value);
+					}
+					cursor.continue();
+				}
+				else{
+					successCallback(result);
+				}
+			};
 		},
 
 		findById:function(type,id,successCallback,errorCallback){
-			
-		}
+			if(!database){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
+
+			}
+
+			var tx=database.transaction([type]);
+			var objectStore=tx.objectStore(type);
+			var request=objectStore.get(id);
+		
+			request.onsuccess=function(event){
+				successCallback(event.target.result);
+			}
+
+			request.onerror=function(event){
+				errorCallback('object_not_stored','no es posible ubicar el objeto solicitado');
+			}
+		};
 	}
 }();
