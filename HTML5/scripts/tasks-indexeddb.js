@@ -177,7 +177,7 @@ storageEngine = function(){
 
 			request.onerror=function(event){
 				errorCallback('object_not_stored','no es posible ubicar el objeto solicitado');
-			}
-		};
+			};
+		}
 	}
 }();

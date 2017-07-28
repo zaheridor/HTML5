@@ -22,45 +22,34 @@ tasksController = function(){
 				$(taskPage).find('[required="required"]').prev('label').append('<span>*</span>').children('span').addClass('required');
 				$(taskPage).find('tbody tr:even').addClass('even');
 				
-				$(taskPage).find('#btnAddTask').click(
-					function(evt){
-						evt.preventDefault();
-						$(taskPage).find('#taskCreation').removeClass('not');
-					}
-				);
+				$(taskPage).find('#btnAddTask').click(function(evt){
+					evt.preventDefault();
+					$(taskPage).find('#taskCreation').removeClass('not');
+				});
 
-				$(taskPage).find('tbody tr').on('click',
-												'editRow',
-												function(evt){
-													$(taskPage).find('#taskCreation').removeClass('not');
-													storageEngine.findById('task',$(evt.target).data().taskId,function(task){
-														$(taskPage).find('form').fromObject(task);
-													},errorLogger);
-												}
+				$(taskPage).find('tbody tr').on('click','.editRow',
+					function(evt){
+						$(taskPage).find('#taskCreation').removeClass('not');
+						storageEngine.findById('task',$(evt.target).data().taskId,function(task){
+							$(taskPage).find('form').fromObject(task);
+						},errorLogger);
+					}
 					
 				);
 
-				$(taskPage).find('#tblTasks tbody').on( 'click',
-													    'deleteRow',
-														function(evt){
-															evt.preventDefault();
-															$(taskPage).find('#tblTasks tbody').on('click',
-																								   'deleteRow',
-																								   function(evt){
-																								   		storageEngine.delete('task',
-																								   							 $(evt.target).data().taskId,
-																							   							 	 function(){
-																								   								$(evt.target).parents('tr').remove();
-																							   								 })
-																								   },errorLogger);
-														}
+				$(taskPage).find('#tblTasks tbody').on('click','.deleteRow',
+					function(evt){
+				   		storageEngine.delete('task',$(evt.target).data().taskId,function(){
+								$(evt.target).parents('tr').remove();
+						},errorLogger);
+				    }
 				);
 
 				$(taskPage).find('#saveTask').click(
 					function(evt){
 						evt.preventDefault();
 						if($(taskPage).find('form').valid()){
-							var task = $('form').toObject();
+							var task = $(taskPage).find('form').toObject();
 							storageEngine.save('task',task,function(){
 								$(taskPage).find('#tblTasks tbody').empty();
 								tasksController.loadTasks();

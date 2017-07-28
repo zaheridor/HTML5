@@ -9,8 +9,8 @@
         <script src="scripts/jquery.validate.js"></script>
         <script src="scripts/jquery-serialization.js"></script>
         <script src="scripts/tasks-controller.js"></script>
-        <!--script src="scripts/tasks-webstorage.js"></script-->
-        <script src="scripts/tasks-indexeddb.js"></script>
+        <!--script src="scripts/tasks-webstorage.js"></script>
+        <script src="scripts/tasks-indexeddb.js"></script-->
     </head>
     <body>
         <header>
@@ -64,13 +64,29 @@
         <footer>Tiene 3 tareas</footer>
     </body>
     <script>
-        $(document).ready(
-            function(){
+        function initScreen(){
+            $(document).ready(function(){
                 tasksController.init($('#taskPage'),function(){
                     tasksController.loadTasks();
                 });
-            }
-        );
+            });
+        }
+
+
+        if(window.indexedBD){
+            $.getScript("scripts/tasks-indexeddb.js").done(function(script,textStatus){
+                initScreen();
+            }).fail(function(jqxhr,settings,exception){
+                console.log('Error al cargar el script indexedDB')
+            });
+        }
+        else if(window.localStorage){
+            $.getScript("scripts/tasks-webstorage.js").done(function(script,textStatus){
+                initScreen();
+            }).fail(function(jqxhr,settings,exception){
+                console.log('Error al cargar el script webstorage')
+            });
+        }
     </script>
     <script id="taskRow" type="text/x-jQuery-tmpl">
         <tr>
