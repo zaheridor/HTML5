@@ -6,6 +6,27 @@ tasksController = function(){
 	var taskPage;
 	var initialised = false;
 
+	function taskCountChanged(){
+		var count = $(taskPage).find('#tblTasks tbody tr').length;
+		$('footer').find('#taskCount').text(count);
+	}
+
+	function clearTask(){
+		$(taskPage).find('form').fromObject({});
+	}
+
+	function renderTable(){
+		$.each($(taskPage).find('#tblTasks tbody tr'),function(idx,row){
+			var due = Date.parse($(row).find('[datetime]').text());
+			if(due.compareTo(Date.today()) < 0){
+				$(row).addClass("overdue");
+			}
+			else if(due.compareTo((2).days().fromNow()) <= 0){
+				$(row).addClass("warning");
+			}
+		});
+	}
+
 	return{
 		init:function(page,callback){
 			if(initialised){
@@ -41,6 +62,7 @@ tasksController = function(){
 					function(evt){
 				   		storageEngine.delete('task',$(evt.target).data().taskId,function(){
 								$(evt.target).parents('tr').remove();
+								taskCountChanged();
 						},errorLogger);
 				    }
 				);
@@ -53,12 +75,17 @@ tasksController = function(){
 							storageEngine.save('task',task,function(){
 								$(taskPage).find('#tblTasks tbody').empty();
 								tasksController.loadTasks();
-								$(':input').val('');
+								clearTask();
 								$(taskPage).find('#taskCreation').addClass('not');
 							},errorLogger);
 						}
 					}
 				);
+
+				$(taskPage).find('#clearTask').click(function(evt){
+					evt.preventDefault();
+					clearTask();
+				});
 
 				initialised = true;
 			}
@@ -69,6 +96,8 @@ tasksController = function(){
 				$.each(tasks,function(index,task){
 					$('#taskRow').tmpl(task).appendTo($(taskPage).find('#tblTasks tbody'));
 				});
+				taskCountChanged();
+				renderTable();
 			},errorLogger);
 		}
 	}

@@ -9,6 +9,7 @@
         <script src="scripts/jquery.validate.js"></script>
         <script src="scripts/jquery-serialization.js"></script>
         <script src="scripts/tasks-controller.js"></script>
+        <script src="scripts/date.js"></script>
         <!--script src="scripts/tasks-webstorage.js"></script>
         <script src="scripts/tasks-indexeddb.js"></script-->
     </head>
@@ -61,7 +62,7 @@
                 </nav>
             </section>
         </main>
-        <footer>Tiene 3 tareas</footer>
+        <footer>Tiene <span id="taskCount"></span> tareas</footer>
     </body>
     <script>
         function initScreen(){
