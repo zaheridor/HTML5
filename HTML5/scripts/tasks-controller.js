@@ -87,13 +87,29 @@ tasksController = function(){
 					clearTask();
 				});
 
+				$(taskPage).find('#tblTasks tbody').on('click','.completeRow',function(evt){
+					storageEngine.findById('task',$(evt.target).data().taskId,function(task){
+						task.complete=true;
+						storageEngine.save('task',task,function(task){
+							tasksController.loadTasks();
+						},errorLogger);
+					},errorLogger);
+				});
+
 				initialised = true;
 			}
 		},
 
 		loadTasks:function(){
 			storageEngine.findAll('task',function(tasks){
+				tasks.sort(function(o1,o2){
+					return Date.parse(o1.requiredBy).compareTo(Date.parse(o2.requiredBy));
+				});
+				
 				$.each(tasks,function(index,task){
+					if(!task.complete){
+						task.complete=false;
+					}
 					$('#taskRow').tmpl(task).appendTo($(taskPage).find('#tblTasks tbody'));
 				});
 				taskCountChanged();

@@ -91,13 +91,15 @@
     </script>
     <script id="taskRow" type="text/x-jQuery-tmpl">
         <tr>
-            <td>${task}</td>
-            <td><time datetime="${requiredBy}">${requiredBy}</time></td>
-            <td>${category}</td>
+            <td {{if complete==true}}class="taskCompleted"{{/if}}>${task}</td>
+            <td {{if complete==true}}class="taskCompleted"{{/if}}><time datetime="${requiredBy}">${requiredBy}</time></td>
+            <td {{if complete==true}}class="taskCompleted"{{/if}}>${category}</td>
             <td>
                 <nav>
-                    <a href="#" class="editRow" data-task-id="${id}">Editar</a>
-                    <a href="#">Completar</a>
+                    {{if complete!=true}}
+                        <a href="#" class="editRow" data-task-id="${id}">Editar</a>
+                        <a href="#" class="completeRow" data-task-id="${id}">Completar</a>
+                    {{/if}}
                     <a href="#" class="deleteRow" data-task-id="${id}">Borrar</a>
                 </nav>
             </td>
