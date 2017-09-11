@@ -5,7 +5,7 @@ storageEngine = function(){
 	return{
 		init:function(successCallback,errorCallback){
 			if(window.indexedDB){
-				var request = indexedDB.open(window.location.hostname+'DB',1)
+				var request = indexedDB.open(window.location.hostname+'DB')
 				
 				request.onsuccess=function(event){
 					database=request.result;

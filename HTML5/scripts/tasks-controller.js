@@ -48,15 +48,9 @@ tasksController = function(){
 					$(taskPage).find('#taskCreation').removeClass('not');
 				});
 
-				$(taskPage).find('tbody tr').on('click','.editRow',
-					function(evt){
-						$(taskPage).find('#taskCreation').removeClass('not');
-						storageEngine.findById('task',$(evt.target).data().taskId,function(task){
-							$(taskPage).find('form').fromObject(task);
-						},errorLogger);
-					}
-					
-				);
+				$(taskPage).find('#tblTasks tbody').on('click', 'tr', function(evt) {
+					$(evt.target).closest('td').siblings().addBack().toggleClass('rowHighlight');
+				});	
 
 				$(taskPage).find('#tblTasks tbody').on('click','.deleteRow',
 					function(evt){
@@ -66,6 +60,30 @@ tasksController = function(){
 						},errorLogger);
 				    }
 				);
+
+				$(taskPage).find('#tblTasks tbody').on('click','.editRow',
+					function(evt){
+						$(taskPage).find('#taskCreation').removeClass('not');
+						storageEngine.findById('task',$(evt.target).data().taskId,function(task){
+							$(taskPage).find('form').fromObject(task);
+						},errorLogger);
+					}
+					
+				);
+
+				$(taskPage).find('#clearTask').click(function(evt){
+					evt.preventDefault();
+					clearTask();
+				});
+
+				$(taskPage).find('#tblTasks tbody').on('click','.completeRow',function(evt){
+					storageEngine.findById('task',$(evt.target).data().taskId,function(task){
+						task.complete=true;
+						storageEngine.save('task',task,function(){
+							tasksController.loadTasks();
+						},errorLogger);
+					},errorLogger);
+				});
 
 				$(taskPage).find('#saveTask').click(
 					function(evt){
@@ -82,25 +100,12 @@ tasksController = function(){
 					}
 				);
 
-				$(taskPage).find('#clearTask').click(function(evt){
-					evt.preventDefault();
-					clearTask();
-				});
-
-				$(taskPage).find('#tblTasks tbody').on('click','.completeRow',function(evt){
-					storageEngine.findById('task',$(evt.target).data().taskId,function(task){
-						task.complete=true;
-						storageEngine.save('task',task,function(task){
-							tasksController.loadTasks();
-						},errorLogger);
-					},errorLogger);
-				});
-
 				initialised = true;
 			}
 		},
 
 		loadTasks:function(){
+			$(taskPage).find('#tblTasks tbody').empty();
 			storageEngine.findAll('task',function(tasks){
 				tasks.sort(function(o1,o2){
 					return Date.parse(o1.requiredBy).compareTo(Date.parse(o2.requiredBy));
