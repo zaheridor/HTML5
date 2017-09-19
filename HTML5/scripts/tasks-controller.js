@@ -27,8 +27,23 @@ tasksController = function(){
 		});
 	}
 
+	function loadFromCSV(event){
+		var reader = new FileReader();
+		reader.onload = function(evt){
+			var contents = evt.target.result;
+			var lines = contents.split('\n');
+			//console.log(evt.target.result);
+		};
+		reader.onerror = function(evt){
+			errorLogger('cannot_read_file','El archivo especificado no puede ser leído');
+		};
+		reader.readAsText(event.target.files[0]);
+	}
+
 	return{
 		init:function(page,callback){
+			$('#importFile').change(loadFromCSV);
+
 			if(initialised){
 				callback()
 			}

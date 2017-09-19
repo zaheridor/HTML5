@@ -65,6 +65,12 @@
                     <a href="#" id="btnAddTask">Adicionar Tarea</a>
                 </nav>
             </section>
+            <section id="csvImport">
+                <div>
+                    <label for="task">Importar tarea desde archivo CSV</label>
+                    <input type="file" name="importFile" id="importFile">
+                </div>
+            </section>
         </main>
         <footer>Tiene <span id="taskCount"></span> tareas</footer>
     </body>
@@ -76,7 +82,6 @@
                 });
             });
         }
-
 
         if(window.indexedBD){
             $.getScript("scripts/tasks-indexeddb.js").done(function(script,textStatus){
