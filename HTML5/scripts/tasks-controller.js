@@ -15,6 +15,46 @@ tasksController = function(){
 		$(taskPage).find('form').fromObject({});
 	}
 
+	function loadTask(csvTask){
+		var tokens = $.csv.toArray(csvTask);
+		if(tokens.length==3){
+			var task={};
+			task.task=tokens[0];
+			task.requiredBy=tokens[1];
+			task.category=tokens[2];
+			return task;
+		}
+		return null;
+	}
+
+	function loadFromCSV(event){
+		var reader = new FileReader();
+		
+		reader.onload = function(evt){
+			var contents = evt.target.result;
+			var lines = contents.split('\n');
+			var tasks=[];
+			$.each(lines,function(indx,val){
+				if(indx>=1 && val){
+					var task=loadTask(val);
+					if(task){
+						tasks.push(task);
+					}
+				}
+			});
+
+			storageEngine.saveAll('task',tasks,function(){
+				tasksController.loadTasks();
+			},errorLogger);
+		};
+		
+		reader.onerror = function(evt){
+			errorLogger('cannot_read_file','El archivo especificado no puede ser leído');
+		};
+		
+		reader.readAsText(event.target.files[0]);
+	}
+
 	function renderTable(){
 		$.each($(taskPage).find('#tblTasks tbody tr'),function(idx,row){
 			var due = Date.parse($(row).find('[datetime]').text());
@@ -27,23 +67,8 @@ tasksController = function(){
 		});
 	}
 
-	function loadFromCSV(event){
-		var reader = new FileReader();
-		reader.onload = function(evt){
-			var contents = evt.target.result;
-			var lines = contents.split('\n');
-			//console.log(evt.target.result);
-		};
-		reader.onerror = function(evt){
-			errorLogger('cannot_read_file','El archivo especificado no puede ser leído');
-		};
-		reader.readAsText(event.target.files[0]);
-	}
-
 	return{
 		init:function(page,callback){
-			$('#importFile').change(loadFromCSV);
-
 			if(initialised){
 				callback()
 			}
@@ -75,6 +100,8 @@ tasksController = function(){
 						},errorLogger);
 				    }
 				);
+
+				$('#importFile').change(loadFromCSV);
 
 				$(taskPage).find('#tblTasks tbody').on('click','.editRow',
 					function(evt){
@@ -118,7 +145,6 @@ tasksController = function(){
 				initialised = true;
 			}
 		},
-
 		loadTasks:function(){
 			$(taskPage).find('#tblTasks tbody').empty();
 			storageEngine.findAll('task',function(tasks){
@@ -131,9 +157,9 @@ tasksController = function(){
 						task.complete=false;
 					}
 					$('#taskRow').tmpl(task).appendTo($(taskPage).find('#tblTasks tbody'));
+					taskCountChanged();
+					renderTable();
 				});
-				taskCountChanged();
-				renderTable();
 			},errorLogger);
 		}
 	}

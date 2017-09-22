@@ -21,7 +21,7 @@ storageEngine = function(){
 
 		initObjectStore:function(type,successCallback,errorCallback){
 			if(!initialized){
-				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
 			}
 			else if(!localStorage.getItem(type)){
 				localStorage.setItem(type,JSON.stringify({}));
@@ -34,7 +34,7 @@ storageEngine = function(){
 
 		save:function(type,obj,successCallback,errorCallback){
 			if(!initialized){
-				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
 			}
 			else if(!initializedObjectStores[type]){
 				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
@@ -52,7 +52,7 @@ storageEngine = function(){
 
 		findAll:function(type,successCallback,errorCallback){
 			if(!initialized){
-				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
 			}
 			else if(!initializedObjectStores[type]){
 				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
@@ -69,7 +69,7 @@ storageEngine = function(){
 
 		delete:function(type,id,successCallback,errorCallback){
 			if(!initialized){
-				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
 			}
 			else if(!initializedObjectStores[type]){
 				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
@@ -88,7 +88,7 @@ storageEngine = function(){
 
 		findByProperty:function(type,propertyName,propertyValue,successCallback,errorCallback){
 			if(!initialized){
-				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
 			}
 			else if(!initializedObjectStores[type]){
 				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
@@ -106,7 +106,7 @@ storageEngine = function(){
 
 		findById:function(type,id,successCallback,errorCallback){
 			if(!initialized){
-				errorCallback('storage_api_not_initialized','El motor de almacenamiento no está inicializado');
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
 			}
 			else if(!initializedObjectStores[type]){
 				errorCallback('store_not_initialized','El almacenador de objetos '+type+' no ha sido inicializado');
@@ -114,7 +114,28 @@ storageEngine = function(){
 
 			var storageItem = getStorageObject(type);
 			var result = storageItem[id];
-			successCallback(result);	
+			successCallback(result);
+		},
+
+		saveAll:function(type,objs,successCallback,errorCallback){
+			if(!initialized){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
+			}
+			else if(!initializedTables[type]){
+				errorCallback('table_not_initialized','La tabla '+type+' no ha sido inicializada');
+			}
+
+			var storageItem = getStorageObject(type);
+			$.each(objs,function(indx,obj){
+				if(!obj.id){
+					obj.id=$.now();
+				}
+
+				storageItem[obj.id]=obj;
+
+				localStorage.setItem(type,JSON.stringify(storageItem));
+			});
+			successCallback(objs);
 		}
 	}
 }();

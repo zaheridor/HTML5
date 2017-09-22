@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" manifest="tasks.appcache">
+<html lang="en">
     <head>
         <meta charset="utf-8">
         <title>Listas de Tareas</title>
@@ -10,8 +10,7 @@
         <script src="scripts/jquery-serialization.js"></script>
         <script src="scripts/tasks-controller.js"></script>
         <script src="scripts/date.js"></script>
-        <!--script src="scripts/tasks-webstorage.js"></script>
-        <script src="scripts/tasks-indexeddb.js"></script-->
+        <script src="scripts/jquery.csv.js"></script>
     </head>
     <body>
         <header>
@@ -68,7 +67,7 @@
             <section id="csvImport">
                 <div>
                     <label for="task">Importar tarea desde archivo CSV</label>
-                    <input type="file" name="importFile" id="importFile">
+                    <input type="file" id="importFile" name="importFile"/>
                 </div>
             </section>
         </main>
@@ -83,7 +82,7 @@
             });
         }
 
-        if(window.indexedBD){
+        if(window.indexedDB){
             $.getScript("scripts/tasks-indexeddb.js").done(function(script,textStatus){
                 initScreen();
             }).fail(function(jqxhr,settings,exception){

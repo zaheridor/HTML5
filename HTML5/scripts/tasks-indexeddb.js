@@ -94,7 +94,6 @@ storageEngine = function(){
 		findAll:function(type,successCallback,errorCallback){
 			if(!database){
 				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
-
 			}
 
 			var result=[];
@@ -104,7 +103,7 @@ storageEngine = function(){
 				var cursor=event.target.result;
 				if(cursor){
 					result.push(cursor.value);
-					cursor.continue;
+					cursor.continue();
 				}
 				else{
 					successCallback(result);
@@ -138,10 +137,9 @@ storageEngine = function(){
 			};
 		},
 
-		fundByProperty:function(type,propertyName,propertyValue,successCallback,errorCallback){
+		findByProperty:function(type,propertyName,propertyValue,successCallback,errorCallback){
 			if(!database){
 				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
-
 			}
 
 			var result=[];
@@ -164,7 +162,6 @@ storageEngine = function(){
 		findById:function(type,id,successCallback,errorCallback){
 			if(!database){
 				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
-
 			}
 
 			var tx=database.transaction([type]);
@@ -178,6 +175,42 @@ storageEngine = function(){
 			request.onerror=function(event){
 				errorCallback('object_not_stored','no es posible ubicar el objeto solicitado');
 			};
+		},
+
+		saveAll:function(type,objs,successCallback,errorCallback){
+			if(!database){
+				errorCallback('storage_api_not_initialized','El motor de almacenamiento no ha sido inicializado');
+			}
+			
+			var tx = database.transaction([type],"readwrite");
+			
+			tx.oncomplete=function(event){
+				successCallback(objs);
+			};
+			
+			tx.onerror = function(event){
+				errorCallback('transaction_error','No es posible grabar el objeto');
+			};
+
+			var objectStore=tx.objectStore(type);
+			$.each(objs,function(indx,obj){
+				if(!obj.id){
+					delete obj.id;
+				}
+				else{
+					obj.id = parseInt(obj.id)
+				}
+
+				var request = objectStore.put(obj);
+				
+				request.onsuccess=function(event){
+					obj.id=event.target.result;
+				}
+
+				request.onerror=function(event){
+					errorCallback('object_not_stored','no es posible ubicar el objeto solicitado');
+				};
+			});
 		}
 	}
 }();
