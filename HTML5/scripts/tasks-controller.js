@@ -15,37 +15,21 @@ tasksController = function(){
 		$(taskPage).find('form').fromObject({});
 	}
 
-	function loadTask(csvTask){
-		var tokens = $.csv.toArray(csvTask);
-		if(tokens.length==3){
-			var task={};
-			task.task=tokens[0];
-			task.requiredBy=tokens[1];
-			task.category=tokens[2];
-			return task;
-		}
-		return null;
-	}
-
 	function loadFromCSV(event){
 		var reader = new FileReader();
 		
 		reader.onload = function(evt){
 			var contents = evt.target.result;
-			var lines = contents.split('\n');
-			var tasks=[];
-			$.each(lines,function(indx,val){
-				if(indx>=1 && val){
-					var task=loadTask(val);
-					if(task){
-						tasks.push(task);
-					}
-				}
-			});
+			var worker = new Worker('scripts/tasks-csvparser.js');
+			
+			worker.addEventListener('message',function(e){
+				var tasks = e.data;
+				storageEngine.saveAll('task',tasks,function(){
+					tasksController.loadTasks();
+				},errorLogger);
+			},false);
 
-			storageEngine.saveAll('task',tasks,function(){
-				tasksController.loadTasks();
-			},errorLogger);
+			worker.postMessage(contents);
 		};
 		
 		reader.onerror = function(evt){
